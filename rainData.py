@@ -13,11 +13,11 @@ def errorCheck(path):
     for f in files:
         time = os.path.getmtime(f)
         date = datetime.datetime.fromtimestamp(time)
-        if date.day != int(day):
+        if date.day != int(day) or (date.day == int(day) and date.month != int(month)):
             wDate += 1
-        if wDate > 1:
-            print("Error with last modified dates, contact Robert!")
-            sys.exit("Error with last modified dates!")
+            print("Error with last modified dates: ", date.month, "/", date.day, "/", date.year, f)
+    if wDate > 0:
+        print("Error with last modified dates of", wDate, "files.")
 
     if len(files) != 27:
         print("There are not 27 files, contact Robert!")
