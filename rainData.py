@@ -1,45 +1,15 @@
 # import libraries
 import os, datetime, shutil, sys, csv
 
-# check last modified dates
-def errorCheck(path):
-    
-    os.chdir(path)
-    files = os.listdir(path)
-
-    year, month, day = getDate(0)
-
-    wDate = 0;
-    for f in files:
-        time = os.path.getmtime(f)
-        date = datetime.datetime.fromtimestamp(time)
-        if date.day != int(day) or (date.day == int(day) and date.month != int(month)):
-            wDate += 1
-            print("Error with last modified dates: ", date.month, "/", date.day, "/", date.year, f)
-    if wDate > 0:
-        print("Error with last modified dates of", wDate, "files.")
-
-    if len(files) != 27:
-        print("There are not 27 files, contact Robert!")
-        sys.exit("There are not 27 files!")
-
-# create file with yesterday's date as name
+# delete old file and create new one
 def createNewFolder(path):
     
-    year, month, day = getDate(1)
-
-    # format month and day
-    if len(month) == 1: month = "0" + month
-    if len(day) == 1: day = "0" + day
-    
     os.chdir(path)
-
-    title = year + "." + month + "." + day
-    if not os.path.exists(title):
-        os.mkdir(title)
-    else:
-        print("Error: Folder already exists!")
-        sys.exit("Error: Folder already exists!")
+    title = 'Rain Data'
+    if os.path.exists(title):
+        rmpath = path + "/" + title
+        shutil.rmtree(rmpath)
+    os.mkdir(title)
 
     return title
 
@@ -66,13 +36,7 @@ def printResults(rpath, wpath):
     
     d = createDict()
     l = [[] for i in range(27)]
-
-    # check if you want to include more than one day
-    days = input("Enter amount of days you're recording: ")
-    while (not days.isdigit() or int(days) < 1):
-        days = input("Please enter an integer: ")
-    days = int(days)
-    rows = days*24
+    rows = 24
 
     index = 0
     for key in d:
@@ -83,15 +47,28 @@ def printResults(rpath, wpath):
             sum = 0
             for row in reader[length-rows:length]:
                 sum += float(row[len(row)-1])
-            l[index].append(key)
-            l[index].append(round(sum, 2))
-            l[index].append(row[0])
-            index += 1
+            #don't add row if newreadingdate isn't today's date
+            if datetime.datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S').date() != datetime.date.today():
+                continue
+            else:
+                l[index].append(key)
+                l[index].append(round(sum, 2))
+
+                #modify date for maximo integration
+                modDate = datetime.datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%dT%H:%M:%S')
+                l[index].append(modDate)
+                
+                l[index].append('RAIN')
+                l[index].append('1000')
+                
+                index += 1
         file.close()
         
     os.chdir(wpath)
     with open('rain.csv', 'w', newline='') as f:
         write = csv.writer(f, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        write.writerow(['FLAT', 'MXMETERInterface', 'AddChange', 'EN'])
+        write.writerow(['ASSETNUM', 'NEWREADING', 'NEWREADINGDATE', 'METERNAME', 'SITEID'])
         for x in range(0, len(l)):
             write.writerow(l[x])
         f.close()
@@ -145,8 +122,6 @@ def main():
     rpath = "S:/"
     dpath = "S:/"
     wpath = "H:"
-
-    errorCheck(dpath)
 
     title = createNewFolder(rpath)
     rpath += "/" + title
