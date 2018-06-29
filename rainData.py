@@ -35,7 +35,7 @@ def printResults(rpath, wpath):
     os.chdir(rpath)
     
     d = createDict()
-    l = [[] for i in range(27)]
+    l = []
     rows = 24
 
     index = 0
@@ -51,6 +51,7 @@ def printResults(rpath, wpath):
             if datetime.datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S').date() != datetime.date.today():
                 continue
             else:
+                l.append([])
                 l[index].append(key)
                 l[index].append(round(sum, 2))
 
