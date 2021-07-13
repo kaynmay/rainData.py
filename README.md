@@ -1,5 +1,5 @@
 # rainData.py
-A coworker at my company had a daily task of going into DAT files that were appended to every hour with the amount of rain accumulated at NTMWD weather stations. She calculated the total rainfall from the last 24 hours and entered the data into our IBM Maximo Asset Management system that would kick off preventative maintenance work orders if a certain amount of rain had fallen over night.
+A coworker at my company had a daily task of going into DAT files that were appended to every hour with the amount of rain accumulated at the company's weather stations. She calculated the total rainfall from the last 24 hours and entered the data into our IBM Maximo Asset Management system that would kick off preventative maintenance work orders if a certain amount of rain had fallen over night.
 
 My manager knew I had Python experience, so one of the first projects given to me was to figure out if this process could be automated. The first iteration was a script that copied over the DAT files, calculated the total rainfall at each site, and printed out the totals on the screen. My coworker still had to manually input this data into Maximo, but it shortened the process from around 30 minutes to just 10.
 
